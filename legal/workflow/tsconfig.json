@@ -1,0 +1,4 @@
+{
+	"extends": "../../tsconfig.json",
+	"include": ["*.ts", "../extensions/legal-workflow.ts", "../../packages/coding-agent/src/utils/highlight-js.d.ts"]
+}

@@ -1,0 +1,19 @@
+LegalAgent
+
+This repository is an independent source derivative of Pi:
+https://github.com/earendil-works/pi
+Source snapshot: commit 5a3a03a7f
+
+The upstream MIT license and copyright notice are retained in LICENSE.
+Copyright (c) 2025 Mario Zechner.
+
+The LegalAgent adaptation adds legal material intake, source and citation
+tools, an optional retrieval HTTP adapter, persistent case workflow,
+legal task prompts and skills, and a local web interface.
+
+The release includes source code, synthetic examples, and public provider
+catalog metadata. It does not include model weights, training datasets,
+legal corpora, vector indices, deployment credentials, or real case records.
+
+This project is not an official Pi release and is not affiliated with a
+model provider, law firm, or judicial authority.

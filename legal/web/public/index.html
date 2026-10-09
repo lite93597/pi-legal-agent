@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="light" />
+		<title>LegalAgent · 法律研判工作台</title>
+		<link rel="stylesheet" href="/style.css" />
+		<script src="/app.js" defer></script>
+	</head>
+	<body>
+		<div class="app-shell">
+			<header class="topbar">
+				<div class="brand" aria-label="LegalAgent 法律研判工作台">
+					<div class="brand-seal" aria-hidden="true">法</div>
+					<div class="brand-copy">
+						<span class="brand-overline">LEGALAGENT / LOCAL WORKSPACE</span>
+						<strong>法律研判工作台</strong>
+					</div>
+				</div>
+				<div id="connection" class="connection" role="status" aria-live="polite">
+					<span class="connection-dot" aria-hidden="true"></span>
+					<span id="connection-text">正在检查服务</span>
+				</div>
+			</header>
+
+			<div class="workspace">
+				<aside class="case-panel" aria-labelledby="case-title">
+					<div class="case-spine" aria-hidden="true"><span>CASE FILE</span></div>
+					<div class="case-panel-inner">
+						<div class="section-label"><span class="section-marker"></span> 当前案卷</div>
+						<h1 id="case-title">把材料放在<br />可核验的位置。</h1>
+						<p class="case-intro">此页使用启动服务时指定的案件目录。回答中的材料定位符可对应到预处理后的来源清单。</p>
+
+						<div class="case-detail">
+							<div class="detail-title">案件目录</div>
+							<output id="case-path" class="case-path">正在读取…</output>
+						</div>
+						<div class="case-detail model-detail">
+							<div class="detail-title">当前模型</div>
+							<output id="model-name" class="model-name">正在读取…</output>
+						</div>
+						<div class="case-detail model-detail">
+							<div class="detail-title">法律知识检索</div>
+							<output id="rag-status" class="model-name">正在检查…</output>
+						</div>
+
+						<details id="workflow-panel" class="workflow-panel" open>
+							<summary>办案进度 <output id="workflow-stage">接案</output></summary>
+							<p id="workflow-counts" class="workflow-counts">正在读取案件记录…</p>
+							<div id="workflow-steps" class="workflow-steps" aria-label="办案阶段">
+								<button type="button" class="workflow-step suggestion" data-stage="intake" data-prompt="请读取案件状态，继续接案：明确任务目标、法域、程序阶段和适用法律时间，保存材料清单、当事人陈述与待核项。">接案</button>
+								<button type="button" class="workflow-step suggestion" data-stage="evidence" data-prompt="请读取案件状态，推进证据整理阶段；检查阶段条件，把事实、当事人陈述、推论与出处分别保存，列出证据缺口和取证任务。">证据</button>
+								<button type="button" class="workflow-step suggestion" data-stage="analysis" data-prompt="请读取案件状态，推进法律依据与争点分析；保存争点的正反事实、法律版本和待核效力，材料不足时形成条件分析。">争点</button>
+								<button type="button" class="workflow-step suggestion" data-stage="strategy" data-prompt="请读取案件状态，推进方案阶段；保存主要方案、备选方案、不利论点、证据条件和风险，不保证结果。">方案</button>
+								<button type="button" class="workflow-step suggestion" data-stage="draft" data-prompt="请读取案件状态，检查起草条件后推进文书阶段；根据已有事实和方案起草，缺失项占位，并保存含来源、待核项和复核内容的草稿。">起草</button>
+								<button type="button" class="workflow-step suggestion" data-stage="review" data-prompt="请读取案件状态，检查已保存草稿后推进审校交接；核对引用、遗漏和不利条件，列出专业人员须审阅的事项及下一步任务。">审校</button>
+							</div>
+							<p class="workflow-hint">选择阶段可准备对应任务，推进时会检查所需材料和产物。</p>
+							<div class="detail-title">待办事项</div>
+							<ul id="workflow-tasks" class="workflow-tasks"></ul>
+							<div class="detail-title">已保存草稿 · 待专业审阅</div>
+							<ul id="workflow-drafts" class="workflow-drafts"></ul>
+							<p id="workflow-warning" class="workflow-warning" hidden></p>
+						</details>
+
+						<div class="boundary-note">
+							<span class="boundary-label">资料边界</span>
+							<p>原件由只读工具查看；工作记录保存在本案目录，草稿保存须在启动时开启。连接自备知识库后可检索法规与案例；引用的适用性与现行效力仍需核实。</p>
+						</div>
+						<button id="retry-connection" class="text-button" type="button" hidden>重新检查连接 <span aria-hidden="true">↗</span></button>
+					</div>
+				</aside>
+
+				<main class="chat-panel" aria-labelledby="chat-title">
+					<div class="chat-heading">
+						<div>
+							<div class="section-label"><span class="section-marker"></span> 案件对话</div>
+							<h2 id="chat-title">向 LegalAgent 提问</h2>
+						</div>
+						<button id="new-chat" class="new-chat" type="button">新对话</button>
+					</div>
+
+					<div id="messages" class="messages" role="log" aria-label="对话记录">
+						<div id="empty-state" class="empty-state">
+							<div class="empty-rule" aria-hidden="true"></div>
+							<p class="empty-kicker">从案卷开始</p>
+							<h3>先问一个具体问题。</h3>
+							<p class="empty-description">可以请 Agent 清点材料、梳理事实，或指出尚缺的证据。回答中出现的来源定位和待核实事项，请结合原件复核。</p>
+							<div class="suggestions" aria-label="提问示例">
+								<button type="button" class="suggestion" data-prompt="请清点本案已导入的材料，并说明每份材料可以证明什么。">清点已导入的材料 <span aria-hidden="true">↗</span></button>
+								<button type="button" class="suggestion" data-prompt="请依据已导入材料梳理关键事实、时间线和争议点，并标明来源。">梳理事实与争议点 <span aria-hidden="true">↗</span></button>
+								<button type="button" class="suggestion" data-prompt="请列出目前无法确认的事实，以及下一步需要补充或核实的证据。">列出待核实证据 <span aria-hidden="true">↗</span></button>
+								<button type="button" class="suggestion" data-prompt="请检索《中华人民共和国刑法》第二十条的当前层原文，读取并核验相关引文；说明实际审核范围和适用条件，不能把知识库快照当作截至今天的效力证明。">查找法律依据 <span aria-hidden="true">↗</span></button>
+							</div>
+						</div>
+					</div>
+
+					<div class="composer-area">
+						<p id="page-error" class="page-error" role="alert" hidden></p>
+						<form id="chat-form" class="composer">
+							<label class="composer-label" for="message-input">你的问题</label>
+							<textarea id="message-input" name="message" rows="3" placeholder="例如：现有材料能否支持对方违约的主张？" required disabled></textarea>
+							<div class="composer-footer">
+								<span id="response-status" class="response-status" role="status" aria-live="polite">连接服务后可以提问</span>
+								<div class="composer-actions">
+									<span class="keyboard-hint">Enter 发送 · Shift + Enter 换行</span>
+									<button id="stop-button" class="stop-button" type="button" hidden>停止生成</button>
+									<button id="send-button" class="send-button" type="submit" disabled>发送问题 <span aria-hidden="true">→</span></button>
+								</div>
+							</div>
+						</form>
+						<p class="footer-note">本案记录与对话保存在本机，刷新可恢复当前对话。“新对话”会保留案件工作记录。重要法律判断需专业审阅。</p>
+					</div>
+				</main>
+			</div>
+		</div>
+	</body>
+</html>

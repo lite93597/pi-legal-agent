@@ -1,0 +1,7 @@
+{
+	"defaultProvider": "legal-local",
+	"defaultModel": "legal-model",
+	"defaultThinkingLevel": "off",
+	"enabledModels": ["legal-local/legal-model"],
+	"compaction": { "enabled": true, "reserveTokens": 8192, "keepRecentTokens": 6000 }
+}

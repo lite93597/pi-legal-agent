@@ -1,0 +1,27 @@
+{
+	"providers": {
+		"legal-local": {
+			"baseUrl": "http://127.0.0.1:8000/v1",
+			"api": "openai-completions",
+			"apiKey": "$LEGALAGENT_API_KEY",
+			"compat": {
+				"supportsStore": false,
+				"supportsDeveloperRole": false,
+				"supportsReasoningEffort": false,
+				"supportsStrictMode": false,
+				"maxTokensField": "max_tokens"
+			},
+			"models": [
+				{
+					"id": "legal-model",
+					"name": "User-provided legal model",
+					"reasoning": false,
+					"input": ["text"],
+					"contextWindow": 20480,
+					"maxTokens": 4096,
+					"samplingParams": { "temperature": 0, "top_p": 1 }
+				}
+			]
+		}
+	}
+}
