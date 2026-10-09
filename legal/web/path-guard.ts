@@ -15,8 +15,10 @@ function within(path: string, root: string): boolean {
 export function isAllowedReadPath(path: string, caseDir: string, skillsDir: string): boolean {
 	if (!path.trim()) return false;
 	try {
-		const target = realpathSync.native(resolveReadPath(path, caseDir));
-		return within(target, caseDir) || within(target, skillsDir);
+		const caseRoot = realpathSync.native(caseDir);
+		const skillsRoot = realpathSync.native(skillsDir);
+		const target = realpathSync.native(resolveReadPath(path, caseRoot));
+		return within(target, caseRoot) || within(target, skillsRoot);
 	} catch {
 		return false;
 	}

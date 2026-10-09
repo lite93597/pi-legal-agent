@@ -45,3 +45,37 @@ test("web read stays inside the case and legal skills roots", (t) => {
 		rmdirSync(root);
 	}
 });
+
+test("declared root aliases are canonicalized without allowing an external junction", () => {
+	const root = mkdtempSync(join(tmpdir(), "legal-web-root-alias-"));
+	const caseDir = join(root, "case");
+	const skillsDir = join(root, "skills");
+	const outsideDir = join(root, "outside");
+	const caseAlias = join(root, "case-alias");
+	const skillsAlias = join(root, "skills-alias");
+	const escapeLink = join(caseDir, "escape");
+	for (const directory of [caseDir, skillsDir, outsideDir]) mkdirSync(directory);
+	const caseFile = join(caseDir, "notes.txt");
+	const skillFile = join(skillsDir, "SKILL.md");
+	const outsideFile = join(outsideDir, "outside.txt");
+	for (const file of [caseFile, skillFile, outsideFile]) writeFileSync(file, "synthetic");
+	const links: string[] = [];
+	try {
+		for (const [target, alias] of [
+			[caseDir, caseAlias],
+			[skillsDir, skillsAlias],
+			[outsideDir, escapeLink],
+		]) {
+			symlinkSync(target, alias, "junction");
+			links.push(alias);
+		}
+		assert.equal(isAllowedReadPath("notes.txt", caseAlias, skillsAlias), true);
+		assert.equal(isAllowedReadPath(join(skillsAlias, "SKILL.md"), caseAlias, skillsAlias), true);
+		assert.equal(isAllowedReadPath(join(escapeLink, "outside.txt"), caseAlias, skillsAlias), false);
+		assert.equal(isAllowedReadPath(outsideFile, caseAlias, skillsAlias), false);
+	} finally {
+		for (const link of links.reverse()) unlinkSync(link);
+		for (const file of [caseFile, skillFile, outsideFile]) unlinkSync(file);
+		for (const directory of [caseDir, skillsDir, outsideDir, root]) rmdirSync(directory);
+	}
+});
