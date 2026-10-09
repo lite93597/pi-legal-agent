@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -24,6 +25,7 @@ class IntakeTests(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
         self.case_dir = Path(self.temporary.name) / "case"
         self.case_dir.mkdir()
+        self.case_dir = self.case_dir.resolve()
 
     def _manifest(self) -> tuple[Path, dict[str, object]]:
         path = self.case_dir / ".legalagent" / "sources" / "manifest.json"
@@ -131,6 +133,8 @@ class IntakeTests(unittest.TestCase):
             [sys.executable, str(Path(__file__).with_name("intake.py")), "--case-dir", str(self.case_dir), str(self.case_dir / "raw.png")],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            env={**os.environ, "PYTHONIOENCODING": "ascii"},
             check=False,
         )
         self.assertEqual(result.returncode, 2)
